@@ -1,8 +1,6 @@
 use strict;
-use Test::More tests => 33;
+use Test::More tests => 58;
 use Log::Procmail;
-
-my $log = Log::Procmail->new("t/procmail.log");
 
 # create a record by hand
 my $rec = Log::Procmail::Abstract->new(
@@ -22,6 +20,11 @@ is( $rec->subject, 'Re: Log::Procmail', "Correct subject");
 is( $rec->folder,  'modules', "Correct folder" );
 is( $rec->size,    '2197', "Correct size" );
 is( $rec->ymd,     '20020205011436', "Correct ymd" );
+is( $rec->source,  undef, "No source" );
+
+# create a logger
+my $log = Log::Procmail->new("t/procmail.log");
+isa_ok( $log, "Log::Procmail" );
 
 # read a record from the first file
 $rec = $log->next;
@@ -32,6 +35,7 @@ is( $rec->subject,
     "Correct subject" );
 is( $rec->folder, '/var/spool/mail/book', "Correct folder" );
 is( $rec->size, 5774, "Correct size" );
+is( $rec->source, 't/procmail.log', "Correct source" );
 
 # read the remaining records
 my $i = 1;
@@ -42,8 +46,16 @@ is( $i, 5, "Remaining logs" );
 $log->push( 't/procmail.log', 't/procmail2.log' );
 $rec = $log->next;
 
-# did we get a new record?
+# did we get the first record again?
 isa_ok( $rec, "Log::Procmail::Abstract" );
+is( $rec->from, 'r21436@start.no',          "Correct from" );
+is( $rec->date, 'Wed Feb  6 18:50:17 2002', "Correct date" );
+is( $rec->subject,
+    'I woke up from my obesity nightmare                         5765',
+    "Correct subject" );
+is( $rec->folder, '/var/spool/mail/book', "Correct folder" );
+is( $rec->size, 5774, "Correct size" );
+is( $rec->source, 't/procmail.log', "Correct source" );
 
 # go to next file, automatically
 $rec = $log->next for 1 .. 5;    # skip 5 records
@@ -55,6 +67,7 @@ is( $rec->subject,
     "Correct subject" );
 is( $rec->folder, '/var/spool/mail/book', "Correct folder" );
 is( $rec->size,   5745, "Correct size" );
+is( $rec->source, 't/procmail2.log', "Correct source" );
 
 # test modifying an abstract
 $rec->from('book@cpan.org');
@@ -77,9 +90,15 @@ close F;
 
 $rec = $log->next;
 is( $rec->from,   'e10299@firemail.de', "Correct from" );
+is( $rec->date,   'Sat Feb  2 10:18:31 2002', "Correct date" );
+is( $rec->subject,
+    'Boost Your Windows Reliability!!!!!!!                         14324',
+    "Correct folder" );
 is( $rec->folder, '/var/spool/mail/book', "Correct folder" );
+is( $rec->size,   3768, "Correct size" );
+is( $rec->source, 't/log.tmp', "Correct source" );
 $rec = $log->next;
-is( defined $rec, '', "No log left" );
+is( $rec, undef, "No log left" );
 
 # a new mail arrives
 open F, ">> t/log.tmp" or die;
@@ -97,13 +116,20 @@ is( $rec->subject, "Make This Valentine's Day Unforgettable.           QTTKE",
     "Correct subject" );
 is( $rec->folder,  '/var/spool/mail/book', "Correct folder" );
 is( $rec->size,    3981, "Correct size" );
+is( $rec->source, 't/log.tmp', "Correct source" );
 
 unlink "t/log.tmp";
 
 # some folders with a space in their name
 $log = Log::Procmail->new('t/procmail3.log');
 $rec = $log->next;
+is( $rec->from, 'lynn@cybermortrates.com', "Correct from" );
+is( $rec->date, 'Tue Oct 10 02:31:27 2000', "Correct date" );
+is( $rec->subject, 'BOOST WINDOWS RELIABILITY                         30865',
+                   "Correct subject" );
 is( $rec->folder, 'qmail-perms ./mail/inbox/', "Correct folder" );
+is( $rec->size, 2585, "Correct size" );
+is( $rec->source, 't/procmail3.log', "Correct source" );
 
 # check that we correctly ignore errors
 $rec = $log->next;
@@ -114,4 +140,20 @@ $rec = $log->next;
 is( ref $rec, '', "Not a Log::Procmail::Abstract" );
 like( $rec, qr/^Can't call method "print" on an undefined value/,
       "Got an error" );
+
+# if errors are ignored and only errors are left in the current file,
+# transparently open the next file
+$log->errors(0);
+$log->push('t/procmail2.log');
+$rec = $log->next; # last log of t/procmail3.log
+$rec = $log->next; # skip the last errors of t/procmail3.log
+
+# this is the first log of t/procmail2.log
+is( $rec->from, 'p11542@24horas.com', "Correct from" );
+is( $rec->date, 'Mon Feb  4 18:29:00 2002', "Correct date" );
+is( $rec->subject,
+    "I didn't want to struggle anymore                         5901",
+    "Correct subject" );
+is( $rec->folder, '/var/spool/mail/book', "Correct folder" );
+is( $rec->size,   5745, "Correct size" );
 
