@@ -31,6 +31,7 @@ ok( $rec->date,    'Tue Feb  5 01:14:36 CET 2002' );
 ok( $rec->subject, 'Re: Log::Procmail' );
 ok( $rec->folder,  'modules' );
 ok( $rec->size,    '2197' );
+ok( $rec->ymd,     '20020205011436' );
 
 # check they exist now
 ok( ref $rec->can('from'),    'CODE' );
@@ -74,6 +75,9 @@ ok( $rec->size,   5745 );
 $rec->from('book@cpan.org');
 ok( $rec->from, 'book@cpan.org' );
 
+$rec->date('Mon Feb  4 18:29:00 2002');
+ok( $rec->ymd, '20020204182900' );
+
 1 while ( $log->next );
 $log->push("t/log.tmp");
 
@@ -110,5 +114,5 @@ ok( $rec->size, 3981 );
 
 unlink "t/log.tmp";
 
-BEGIN { plan tests => 37 }
+BEGIN { plan tests => 39 }
 

@@ -1,5 +1,10 @@
 Revision history for Perl extension Log::Procmail.
 
+0.03  Thu Jul 25 16:34:35 CEST 2002
+	- new ymd() method, that return dates that are easy to sort
+        - Corrected a slight bug when using isa() on a string that
+	  doesn't start by a letter (e.g. an absolute filename)
+
 0.02  Fri Feb 22 23:38:11 CET 2002
         - the Log::Procmail object can now read from filehandles
           (like \*STDIN) or IO::Handle objects.

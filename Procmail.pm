@@ -2,10 +2,14 @@ package Log::Procmail;
 
 require 5.005;
 use strict;
+use Carp;
 use vars qw/ $VERSION /;
 local $^W = 1;
 
-$VERSION = '0.02';
+$VERSION = '0.03';
+
+my %month;
+@month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec / } = (0..11);
 
 =head1 NAME
 
@@ -162,7 +166,7 @@ sub open {
         $log->{fh} = *$file{IO};
         carp "Closed filehandle $log->{fh}" unless $log->{fh}->opened;
     }
-    elsif ( $file->isa('IO::Handle') ) {
+    elsif ( ref $file && $file->isa('IO::Handle') ) {
         $log->{fh} = $file;
     }
     else {
@@ -172,7 +176,7 @@ sub open {
 
 sub DESTROY {
     my $self = shift;
-    if ( $self->{fh}->opened ) { $self->{fh}->close }
+    if ( $self->{fh} && $self->{fh}->opened ) { $self->{fh}->close }
 }
 
 =back
@@ -231,6 +235,21 @@ sub AUTOLOAD {
         # now do it
         goto &{$AUTOLOAD};
     }
+}
+
+=item $rec->ymd()
+
+Return the date in the form C<yyyymmmddhhmmss> where each field is what
+you think it is. C<;-)> This method is read-only.
+
+=cut
+
+sub ymd {
+    my $self = shift;
+    #croak "Log::Procmail::Abstract::ymd cannot be used to set the date"
+    #  if shift;
+    $self->{date} =~ /^... (...) (..) (..):(..):(..) .*(\d\d\d\d)$/;
+    return sprintf( "%04d%02d%02d$3$4$5", $6, $month{$1}+1, $2 );
 }
 
 =back
