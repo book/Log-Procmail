@@ -1,8 +1,8 @@
 Changes
-mailstat.pl
+lib/Log/Procmail.pm
+scripts/mailstat.pl
 Makefile.PL
 MANIFEST
-Procmail.pm
 README
 t/00basic.t
 t/01pod.t

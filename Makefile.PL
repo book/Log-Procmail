@@ -3,8 +3,8 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'         => 'Log::Procmail',
-    'VERSION_FROM' => 'Procmail.pm', # finds $VERSION
+    'VERSION_FROM' => 'lib/Log/Procmail.pm',
     'PREREQ_PM'    => { Test::More => 0 },
-    'EXE_FILES'    => [ 'mailstat.pl' ],
+    'EXE_FILES'    => [ 'scripts/mailstat.pl' ],
     'AUTHOR'       => 'Philippe "BooK" Bruhat <book@cpan.org>',
 );
