@@ -29,10 +29,15 @@ $log = new Log::Procmail $file;
 $rec = $log->next;
 ok( $rec->from, 'r21436@start.no' );
 
+# simply check the accessor
+ok( 0, $log->errors );
+ok( 1, $log->errors( 1 ) );
+ok( 1, $log->errors );
+
 # prepare the first test (could I load the object)
 BEGIN {
     $| =1;
-    plan tests => 6;
+    plan tests => 9;
     use Log::Procmail;
 }
 

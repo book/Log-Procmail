@@ -91,8 +91,8 @@ EOT
 close F;
 
 $rec = $log->next;
-ok( $rec->from,    'e10299@firemail.de' );
-ok( $rec->folder,  '/var/spool/mail/book' );
+ok( $rec->from,   'e10299@firemail.de' );
+ok( $rec->folder, '/var/spool/mail/book' );
 $rec = $log->next;
 ok( defined $rec, '' );
 
@@ -110,9 +110,23 @@ ok( $rec->from,    'Viagra9520@eudoramail.com' );
 ok( $rec->date,    'Sat Feb  2 11:58:00 2002' );
 ok( $rec->subject, "Make This Valentine's Day Unforgettable.           QTTKE" );
 ok( $rec->folder,  '/var/spool/mail/book' );
-ok( $rec->size, 3981 );
+ok( $rec->size,    3981 );
 
 unlink "t/log.tmp";
 
-BEGIN { plan tests => 39 }
+# some folders with a space in their name
+$log = Log::Procmail->new('t/procmail3.log');
+$rec = $log->next;
+ok( $rec->folder, 'qmail-perms ./mail/inbox/' );
+
+# check that we correctly ignore errors
+$rec = $log->next;
+ok( $rec->from, 'dailytip@bdcimail.com' );
+$log->errors(1);
+
+$rec = $log->next;
+ok( ref $rec, '' );
+ok( $rec, qr/^Can't call method "print" on an undefined value/ );
+
+BEGIN { plan tests => 43 }
 
