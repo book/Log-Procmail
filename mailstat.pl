@@ -84,7 +84,8 @@ if ( $logfile ne '-' and $logfile ne '' ) {
     if ( -z $logfile ) {
         if ( !$opt{s} ) {
             if ( -f $logfile ) {
-                print 'No mail arrived since ', strftime( "%b %d %H:%M\n",
+                print 'No mail arrived since ',
+                  strftime( "%b %d %H:%M\n",
                     localtime( ( stat($logfile) )[9] ) );
             }
             else { print "Can't find your LOGFILE=$logfile"; }
@@ -172,10 +173,18 @@ continue {
 }
 
 # print the summary
-for my $folder ( sort keys %data ) {
-    $opt{folder} ( @{ $data{$folder} }, $folder );
+for my $folder (
+    sort {
+        my ( $c, $d ) = ( $a, $b );
+        $c =~ y/a-zA-Z0-9//cd;
+        $d =~ y/a-zA-Z0-9//cd;
+        $c cmp $d
+    } keys %data
+  )
+{
+    $opt{folder}( @{ $data{$folder} }, $folder );
 }
-$opt{summary} (@total);
+$opt{summary}(@total);
 
 # the usage function
 sub usage {
