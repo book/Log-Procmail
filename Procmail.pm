@@ -9,7 +9,7 @@ $VERSION = '0.01';
 
 =head1 NAME
 
-Log::Procmail - Perl extension for reading procmail logiles.
+Log::Procmail - Perl extension for reading procmail logfiles.
 
 =head1 SYNOPSIS
 
@@ -81,50 +81,57 @@ Procmail(1) log look like the following:
 =cut
 
 sub next {
-    my $log = shift;        # who needs $self?
-    my $fh  = $log->{fh};
+    my $log = shift;    # who needs $self?
 
     # open the file if necessary
-    unless ( $fh->opened ) {
+    unless ( $log->{fh}->opened ) {
         if ( @{ $log->{files} } ) {
             my $file = shift @{ $log->{files} };
-            $fh->open($file) or carp "Can't open $file: $!";
+            $log->open($file);
         }
         else { return }
     }
 
     # try to read a record (3 lines)
+    my $fh  = $log->{fh};
     my $rec = Log::Procmail::Abstract->new;
     my $read;
     READ: {
         while (<$fh>) {
-            /^procmail: / && next;           # ignore debug comments
+            /^procmail: / && next;    # ignore debug comments
             $read++;
+
             # should carp if doesn't get what's expected
             # (From, then Subject, then Folder)
-            /^From\s+(\S+)\s+(.*)/     && do {
+            /^From\s+(\S+)\s+(.*)/ && do {
+
                 # assert: $read == 1;
-                $rec->from( $1 );
-                $rec->date( $2 );
+                $rec->from($1);
+                $rec->date($2);
             };
+
             # assert: $read == 2;
             /^ Subject: (.*)/          && do { $rec->subject($1) };
             /^  Folder: (\S+)\s+(\d+)/ && do {
+
                 # assert: $read == 3;
                 $rec->folder($1);
                 $rec->size($2);
                 last;
             };
         }
+
         # in case we couldn't read a line
-        if(!$read) {
+        if ( !$read ) {
+
             # go to next file
-            if( @{ $log->{files} } ) {
+            if ( @{ $log->{files} } ) {
                 $fh->close;
                 my $file = shift @{ $log->{files} };
-                $fh->open( $file ) or carp "Can't open $file: $!";
+                $log->open($file);
                 redo READ;
             }
+
             # unless it's the last one
             else { return }
         }
@@ -146,9 +153,26 @@ sub push {
     push @{ $log->{files} }, @_;
 }
 
+# *internal method*
+# opens a file or replace the old filehandle by the new one
+# push() can therefore accept refs to typeglobs, IO::Handle, or filenames
+sub open {
+    my ( $log, $file ) = @_;
+    if ( ref $file eq 'GLOB' ) {
+        $log->{fh} = *$file{IO};
+        carp "Closed filehandle $log->{fh}" unless $log->{fh}->opened;
+    }
+    elsif ( $file->isa('IO::Handle') ) {
+        $log->{fh} = $file;
+    }
+    else {
+        $log->{fh}->open($file) or carp "Can't open $file: $!";
+    }
+}
+
 sub DESTROY {
     my $self = shift;
-    if( $self->{fh}->opened ) { $self->{fh}->close }
+    if ( $self->{fh}->opened ) { $self->{fh}->close }
 }
 
 =back
@@ -197,6 +221,7 @@ sub AUTOLOAD {
     my $attr = $1;
     if ( $attr eq lc $attr ) {    # accessors are lowercase
         no strict 'refs';
+
         # create the method
         *{$AUTOLOAD} = sub {
             my $self = shift;
