@@ -175,9 +175,9 @@ continue {
 
 # print the summary
 for my $folder ( sort keys %data) {
-    $opt{folder}( @{ $data{$folder} }, $folder );
+    $opt{folder}->( @{ $data{$folder} }, $folder );
 }
-$opt{summary}(@total);
+$opt{summary}->(@total);
 
 # the usage function
 sub usage {
