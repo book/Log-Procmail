@@ -210,6 +210,10 @@ sub AUTOLOAD {
 
 =back
 
+=head1 TODO
+
+The Log::Procmail object should be able to read from STDIN.
+
 =head1 BUGS
 
 Please report all bugs through the rt.cpan.org interface:
