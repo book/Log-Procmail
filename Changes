@@ -1,5 +1,12 @@
 Revision history for Perl extension Log::Procmail.
 
+0.08  Mon Apr 26 14:55:41 CEST 2004
+        - the fh() method returns a filehandle to the currently opened
+          log file
+        - the select() method returns a IO::Select object watching the
+          current fh()
+        - example script from Ian Langworth (thanks!)
+
 0.07  Mon Apr 26 00:31:58 CEST 2004
         - support From addresses with spaces inside (darn spammers)
         - moved all files to lib/ and scripts, so as to avoid installing
