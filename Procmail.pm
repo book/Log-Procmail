@@ -24,7 +24,7 @@ Log::Procmail - Perl extension for reading procmail logfiles.
 
 =head1 DESCRIPTION
 
-Log::Procmail reads procmail(1) logfiles and return the abstracts one by one.
+Log::Procmail reads procmail(1) logfiles and returns the abstracts one by one.
 
 =cut
 
@@ -250,8 +250,11 @@ http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Procmail
 Philippe "BooK" Bruhat <book@cpan.org>.
 
 Thanks to Briac "Oeufmayo" Pilpré and David "Sniper" Rigaudiere for early
-comments on irc. Thanks to Michael Schwern for insisting so much on the
+comments on irc. Many thanks to Michael Schwern for insisting so much on the
 importance of tests and documentation.
+
+Many thanks to "Les Mongueurs de Perl" for making cvs.mongueurs.net
+available for Log-Procmail and many other projects.
 
 =head1 COPYRIGHT 
 
