@@ -9,12 +9,17 @@ ok( $loaded, 1 );
 my $log = new Log::Procmail;
 ok( ref($log), "Log::Procmail" );
 
+# read from a filename
+$log = Log::Procmail->new( "t/procmail.log" );
+my $rec = $log->next;
+ok( $rec->from, 'r21436@start.no' );
+
 open F, "t/procmail.log" and my $open = 1;
 ok( $open, 1 );
 
 # read from a filehandle (glob ref)
-$log->push( \*F );
-my $rec = $log->next;
+$log = Log::Procmail->new( \*F );
+$rec = $log->next;
 ok( $rec->from, 'r21436@start.no' );
 
 # read from a IO::Handle
@@ -27,7 +32,7 @@ ok( $rec->from, 'r21436@start.no' );
 # prepare the first test (could I load the object)
 BEGIN {
     $| =1;
-    plan tests => 5;
+    plan tests => 6;
     use Log::Procmail;
 }
 
