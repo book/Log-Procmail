@@ -7,6 +7,7 @@ use vars qw/ %opt /;
 
 %opt = (
     oldsuffix => '.old',
+    summary   => sub { },
 );
 
 =head1 NAME
@@ -77,6 +78,8 @@ else { $oldlogfile = $logfile . $opt{oldsuffix} }
 # -o      use the old logfile
 $logfile = $oldlogfile if $opt{o};
 
+# detect if there is new mail
+# -s      silent in case of no mail
 if ( $logfile ne '-' and $logfile ne '' ) {
     if ( -z $logfile ) {
         if ( !$opt{s} ) {
@@ -96,7 +99,7 @@ else {
         $opt{t} = 1;
     }
     $opt{k} = 1;
-    $logfile = '';
+    $logfile = \*STDIN;
 }
 
 # -k      keep logfile intact
@@ -108,10 +111,71 @@ if ( !$opt{k} ) {
 }
 else { $oldlogfile = $logfile }
 
-# -l      long display format
-# -m      merge any errors into one line
 # -t      terse display format
-# -s      silent in case of no mail
+# -l      long display format
+if ( !$opt{t} ) {
+    if ( $opt{l} ) {
+        print "\n  Total Average  Number Folder\n",
+          "  ----- -------  ------ ------\n";
+        $opt{summary} = sub {
+            printf "  ----- -------  ------\n%7d %7d %7d\n", $_[0],
+              $_[0] / $_[1], $_[1];
+        };
+    }
+    else {
+        print "\n  Total  Number Folder\n", "  -----  ------ ------\n";
+        $opt{summary} = sub {
+            printf "  -----  ------\n%7d %7d\n", @_;
+        };
+    }
+}
+
+# the per folder format line
+$opt{folder} =
+  $opt{l}
+  ? sub { printf "%7d %7d %7d %s\n", $_[0], $_[0] / $_[1], $_[1], $_[2] }
+  : sub { printf "%7d %7d %s\n", @_ };
+
+# and now, let's forget awk and use Log::Procmail
+my $log = Log::Procmail->new($oldlogfile);
+$log->errors(1);
+my ( $rec, $size, %data, @total );
+
+# fetch data
+while ( $rec = $log->next ) {
+
+    # if it's an error line
+    if ( !ref $rec ) {
+        my $folder = $opt{m} ? ' ## diagnostic messages ##' : " ## $rec";
+        $folder =~ s/\t/\\t/g;
+        $data{$folder}[0] ||= 0;
+        $data{$folder}[1]++;
+        $size = 0;
+        next;
+    }
+
+    # We got an abstract. Good.
+    my $folder = $rec->folder;
+
+    # This is straight from mailstat (don't ask me)
+    $folder =~ s{/msg\.[-0-9A-Za-z_]+$}{/};
+    $folder =~ s{/new/[-0-9A-Za-z_][-0-9A-Za-z_.,+:%@]*$}{/};
+    $folder =~ s{/new/\d+$}{/.};
+    $data{$folder}[0] += $size = $rec->size;
+    $data{$folder}[1]++;
+}
+continue {
+
+    # global statistics
+    $total[0] += $size;
+    $total[1]++;
+}
+
+# print the summary
+for my $folder ( sort keys %data ) {
+    $opt{folder} ( @{ $data{$folder} }, $folder );
+}
+$opt{summary} (@total);
 
 # the usage function
 sub usage {
