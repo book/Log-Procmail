@@ -5,4 +5,5 @@ WriteMakefile(
     'NAME'		=> 'Log::Procmail',
     'VERSION_FROM'	=> 'Procmail.pm', # finds $VERSION
     'PREREQ_PM'		=> {}, # e.g., Module::Name => 1.1
+    'EXE_FILES'         => [ 'mailstat.pl' ],
 );
