@@ -12,6 +12,7 @@ CVS/.*
 ^Makefile\.[a-z]+$
 ^pm_to_blib$
 ^html/
+^cover_db/
 ~$
 (^|/)\.#
 \.SKIP$
