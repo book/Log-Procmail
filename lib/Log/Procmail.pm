@@ -3,12 +3,13 @@ package Log::Procmail;
 require 5.005;
 use strict;
 use IO::File;
+use IO::Select;
 use Carp;
 
 use vars qw/ $VERSION /;
 local $^W = 1;
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 my %month;
 @month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec /} = ( 0 .. 11 );
@@ -21,14 +22,14 @@ Log::Procmail - Perl extension for reading procmail logfiles.
 
 =head1 SYNOPSIS
 
- use Log::Procmail;
+    use Log::Procmail;
 
- my $log = new Log::Procmail 'procmail.log';
+    my $log = new Log::Procmail 'procmail.log';
 
- # loop on every abstract
- while(my $rec = $log->next) {
-     # do something with $rec->folder, $rec->size, etc.
- }
+    # loop on every abstract
+    while(my $rec = $log->next) {
+        # do something with $rec->folder, $rec->size, etc.
+    }
 
 =head1 DESCRIPTION
 
@@ -46,9 +47,9 @@ Log::Procmail object.
 The constructor accepts a list of file as parameter. This allows you to
 read records from several files in a row:
 
- $log = Log::Procmail->new( "$ENV{HOME}/.procmail/log.2",
-                            "$ENV{HOME}/.procmail/log.1",
-                            "$ENV{HOME}/.procmail/log", );
+    $log = Log::Procmail->new( "$ENV{HOME}/.procmail/log.2",
+                               "$ENV{HOME}/.procmail/log.1",
+                               "$ENV{HOME}/.procmail/log", );
 
 When $log reaches the end of the file "log", it doesn't close the file.
 So, after B<procmail> processes some incoming mail, the next call to next()
@@ -81,9 +82,9 @@ were appended.
 
 Procmail(1) log look like the following:
 
- From karen644552@btinternet.com  Fri Feb  8 20:37:24 2002
-  Subject: Stock Market Volatility Beating You Up? (18@2)
-   Folder: /var/spool/mail/book						   2840
+    From karen644552@btinternet.com  Fri Feb  8 20:37:24 2002
+     Subject: Stock Market Volatility Beating You Up? (18@2)
+      Folder: /var/spool/mail/book						   2840
 
 Some informational messages can be put by procmail(1) in the log file.
 If the C<errors> attribute is true, these lines are returned one at a time.
@@ -111,17 +112,8 @@ Log::Procmail::Abstract object. Here is an example:
 sub next {
     my $log = shift;    # who needs $self?
 
-    # open the file if necessary
-    unless ( $log->{fh}->opened ) {
-        if ( @{ $log->{files} } ) {
-            my $file = shift @{ $log->{files} };
-            $log->_open($file);
-        }
-        else { return }
-    }
-
     # try to read a record (3 lines)
-    my $fh  = $log->{fh};
+    my $fh  = $log->fh;
   READ:
     {
         my $read;
@@ -182,15 +174,10 @@ sub next {
             last READ if @{$log->{buffer}};
 
             # go to next file
-            if ( @{ $log->{files} } ) {
-                $fh->close;
-                my $file = shift @{ $log->{files} };
-                $log->_open($file);
-                redo READ;
-            }
+            redo READ if $log->_open_next;
 
             # unless it's the last one
-            else { return }
+            return;
         }
     }
 
@@ -234,11 +221,45 @@ sub errors {
     @_ ? $self->{errors} = shift: $self->{errors};
 }
 
+=item $fh = $log->fh()
+
+Returns the currently opened filehandle, from which the next call to
+C<next()> will try to read a record.
+
+=cut
+
+sub fh {
+    my $log = shift;
+    $log->_open_next unless $log->{fh}->opened;
+    $log->{fh};
+}
+
+=item $select = $log->select()
+
+Return a IO::Select object that watches the currently opened filehandle.
+
+B<You are not supposed to use C<add()> or C<remove()> on the returned
+IO::Select object.>
+
+=cut
+
+sub select {
+    my $log = shift;
+    $log->fh; # make sure the file is correctly opened and select is updated
+    $log->{select};
+}
+
 # *internal method*
 # opens a file or replace the old filehandle by the new one
 # push() can therefore accept refs to typeglobs, IO::Handle, or filenames
-sub _open {
-    my ( $log, $file ) = @_;
+sub _open_next {
+    my ( $log ) = @_;
+    my $file;
+
+    if ( @{ $log->{files} } ) {
+        $file = shift @{ $log->{files} };
+    } else { return 0 };
+
     if ( ref $file eq 'GLOB' ) {
         $log->{fh} = *$file{IO};
         carp "Closed filehandle $log->{fh}" unless $log->{fh}->opened;
@@ -250,6 +271,8 @@ sub _open {
         $log->{fh}->open($file) or carp "Can't open $file: $!";
     }
     $log->{source} = $file;
+    $log->{select} = IO::Select->new( $log->{fh} );
+    1;
 }
 
 sub DESTROY {
@@ -323,15 +346,56 @@ sub ymd {
 
 =back
 
+=head1 EXAMPLES
+
+Here is an example procmail biff-like script, courtesy of Ian Langworth:
+
+    #/usr/bin/perl -w
+    use strict;
+    use Log::Procmail;
+
+    use constant LOGFILE       => "$ENV{HOME}/procmail.log";
+    use constant VALID_FOLDERS => [qw( agent inbox perl systems )];
+    my $format = "\%8s: \%-30.30s / %s\n";
+
+    my $log = Log::Procmail->new( LOGFILE );
+    $log->errors(1);
+
+    while ( $log->select->can_read ) {
+        my $rec = $log->next;
+
+        # error?
+        warn "$rec\n", next unless ref $rec;
+
+        # ignore mailboxes we don't care about
+        next unless grep { $_ eq $rec->folder } @{ VALID_FOLDERS() };
+
+        # print data
+        printf $format, From    => $rec->from;
+        printf $format, Subject => $rec->subject, $rec->folder;
+    }
+
 =head1 TODO
 
 The Log::Procmail object should be able to read from STDIN.
 
 =head1 BUGS
 
+=over 4
+
+=item *
+
 Sometimes procmail(1) logs are mixed up. When this happens, I've chosen
 to accept them the way mailstat(1) does: they are discarded unless they
 have a C<Folder> line.
+
+=item *
+
+If you use Log::Procmail and the select() method to follow a live logfile
+as in the above example, please not that Log::Procmail will not detect
+when the file is rotated.
+
+=back
 
 Please report all bugs through the rt.cpan.org interface:
 
@@ -344,7 +408,7 @@ Philippe "BooK" Bruhat <book@cpan.org>.
 Thanks to Briac "Oeufmayo" Pilpré and David "Sniper" Rigaudiere for early
 comments on irc. Thanks to Olivier "rs" Poitrey for giving me his huge
 procmail log file (51 Mb spanning over a two-year period) and for probably
-being the only user of this module. Many thanks to Michael Schwern for
+being the first user of this module. Many thanks to Michael Schwern for
 insisting so much on the importance of tests and documentation.
 
 Many thanks to "Les Mongueurs de Perl" for making cvs.mongueurs.net
