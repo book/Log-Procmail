@@ -1,0 +1,6 @@
+Revision history for Perl extension Log::Procmail.
+
+0.01  Sun Feb  3 15:02:16 2002
+	- original version; created by h2xs 1.20 with options
+		-AX -n Log::Procmail
+
