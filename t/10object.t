@@ -1,6 +1,6 @@
 use strict;
 use Log::Procmail;
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 my $log = Log::Procmail->new;
 isa_ok( $log, "Log::Procmail" );
@@ -34,5 +34,14 @@ is( $log->errors, 1, "get errors()");
 
 # test select()
 $log = Log::Procmail->new( 't/procmail.log' );
-is( $log->select->can_read, 1, "One file to read from" );
-is( ($log->select->can_read)[0], $log->fh, "We can read from our file" );
+
+my $no_select = grep $^O eq $_, qw(MSWin32 NetWare dos VMS riscos beos);
+if ($no_select) { is( $log->select, undef, "select() returns undef on $^O" ); }
+else { isa_ok( $log->select, "IO::Select" ); }
+
+SKIP: {
+    skip "select() unusable on $^O", 2 if $no_select;
+    is( $log->select->can_read, 1, "One file to read from" );
+    is( ( $log->select->can_read )[0], $log->fh, "We can read from our file" );
+}
+

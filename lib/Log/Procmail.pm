@@ -241,6 +241,11 @@ Return a IO::Select object that watches the currently opened filehandle.
 B<You are not supposed to use C<add()> or C<remove()> on the returned
 IO::Select object.>
 
+B<Additional warning for C<MSWin32>, C<NetWare>, C<dos>, C<VMS>, C<riscos>
+and C<beos>:> on those systems, C<select()> returns C<undef>.
+(Check F<ext/IO/t/io_sel.t> in the Perl sources for details.
+Hint: look for the message I<4-arg select is only valid on sockets>.)
+
 =cut
 
 sub select {
@@ -271,7 +276,9 @@ sub _open_next {
         $log->{fh}->open($file) or carp "Can't open $file: $!";
     }
     $log->{source} = $file;
-    $log->{select} = IO::Select->new( $log->{fh} );
+    $log->{select} = ( grep $^O eq $_, qw(MSWin32 NetWare dos VMS riscos beos) )
+                   ? undef
+                   : IO::Select->new( $log->{fh} );
     1;
 }
 
@@ -321,7 +328,7 @@ representation of the handle, if a filehandle was given.
 
 for my $attr (qw( from date subject size folder source ) ) {
     no strict 'refs';
-    *{"Log::Procmail::Abstract::$attr"} = sub {
+    *$attr = sub {
         my $self = shift;
         @_ ? $self->{$attr} = shift: $self->{$attr};
     }
