@@ -1,6 +1,10 @@
 Revision history for Perl extension Log::Procmail.
 
-0.01  Sun Feb  3 15:02:16 2002
+0.02  Fri Feb 22 23:38:11 CET 2002
+        - the Log::Procmail object can now read from filehandles
+          (like \*STDIN) or IO::Handle objects.
+
+0.01  Sun Feb  3 15:02:16 CET 2002
 	- original version; created by h2xs 1.20 with options
 		-AX -n Log::Procmail
 
