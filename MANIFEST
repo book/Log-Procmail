@@ -3,7 +3,6 @@ README
 MANIFEST
 Makefile.PL
 Procmail.pm
-mailstat.pl
 t/procmail.log
 t/procmail2.log
 t/object.t

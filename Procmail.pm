@@ -5,7 +5,7 @@ use strict;
 use vars qw/ $VERSION /;
 local $^W = 1;
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 =head1 NAME
 

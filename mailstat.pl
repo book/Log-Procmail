@@ -55,7 +55,6 @@ silent in case of no mail
 
 getopts( 'hklmots', \%opt );
 
-
 # usage
 if( $opt{h} ) {
     ( my $usage =<< '    USAGE' ) =~ s/^    //gm;
