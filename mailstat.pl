@@ -4,6 +4,7 @@ use Log::Procmail;
 use Getopt::Std;
 use POSIX qw( strftime );
 use vars qw/ %opt /;
+use locale;
 
 %opt = (
     oldsuffix => '.old',
@@ -81,14 +82,14 @@ $logfile = $oldlogfile if $opt{o};
 # detect if there is new mail
 # -s      silent in case of no mail
 if ( $logfile ne '-' and $logfile ne '' ) {
-    if ( -z $logfile ) {
+    if ( ! -s $logfile ) {
         if ( !$opt{s} ) {
             if ( -f $logfile ) {
                 print 'No mail arrived since ',
                   strftime( "%b %d %H:%M\n",
-                    localtime( ( stat($logfile) )[9] ) );
+                    localtime( ( stat($oldlogfile) )[9] ) );
             }
-            else { print "Can't find your LOGFILE=$logfile"; }
+            else { print "Can't find your LOGFILE=$logfile\n";  }
         }
         exit 1;
     }
@@ -173,15 +174,7 @@ continue {
 }
 
 # print the summary
-for my $folder (
-    sort {
-        my ( $c, $d ) = ( $a, $b );
-        $c =~ y/a-zA-Z0-9//cd;
-        $d =~ y/a-zA-Z0-9//cd;
-        $c cmp $d
-    } keys %data
-  )
-{
+for my $folder ( sort keys %data) {
     $opt{folder}( @{ $data{$folder} }, $folder );
 }
 $opt{summary}(@total);
@@ -191,12 +184,12 @@ sub usage {
     print STDERR "Usage: mailstat [-klmots] [logfile]\n";
     if (shift) {
         print STDERR << 'USAGE';
-     -k      keep logfile intact
-     -l      long display format
-     -m      merge any errors into one line
-     -o      use the old logfile
-     -t      terse display format
-     -s      silent in case of no mail
+	-k	keep logfile intact
+	-l	long display format
+	-m	merge any errors into one line
+	-o	use the old logfile
+	-t	terse display format
+	-s	silent in case of no mail
 USAGE
     }
     exit 64;
@@ -210,7 +203,7 @@ as a guideline.
 =head1 AUTHOR
 
 This program was written by Philippe 'BooK' Bruhat as an example of
-use for Log::Procmail.
+use for Log::Procmail. It mimics mailstat(1) as much as possible.
 
 The original mailstat(1) was created by S.R. van den Berg,
 The Netherlands.
@@ -221,8 +214,11 @@ The original manual page was written by Santiago Vila
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002, Philippe Bruhat. All Rights Reserved.
-This module is free software. It may be used, redistributed
+Copyright (c) 2002-2004, Philippe Bruhat. All Rights Reserved.
+
+=head1 LICENSE
+
+This script is free software. It may be used, redistributed
 and/or modified under the terms of the Perl Artistic License
 (see http://www.perl.com/perl/misc/Artistic.html)
 
