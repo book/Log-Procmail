@@ -2,6 +2,9 @@ package Log::Procmail;
 
 require 5.005;
 use strict;
+use IO::File;
+use Carp;
+
 use vars qw/ $VERSION /;
 local $^W = 1;
 
@@ -27,12 +30,9 @@ Log::Procmail - Perl extension for reading procmail logfiles.
 
 =head1 DESCRIPTION
 
+=head2 Log::Procmail
+
 Log::Procmail reads procmail(1) logfiles and returns the abstracts one by one.
-
-=cut
-
-use IO::File;
-use Carp;
 
 =over 4
 
@@ -81,6 +81,27 @@ Procmail(1) log look like the following:
  From karen644552@btinternet.com  Fri Feb  8 20:37:24 2002
   Subject: Stock Market Volatility Beating You Up? (18@2)
    Folder: /var/spool/mail/book						   2840
+
+Some informational messages can be put by procmail(1) in the log file.
+If the C<errors> attribute is true, these lines are returned one at a time.
+
+With errors enabled, you have to check that next() actually returns a
+Log::Procmail::Abstract object. Here's is an example:
+
+    $log->errors(1);
+     
+    # fetch data
+    while ( $rec = $log->next ) {
+
+        # if it's an error line
+        if ( !ref $rec ) {
+            # this is not a log, but an informational message
+            ...
+            next;
+        }
+
+        ...
+    }
 
 =cut
 
