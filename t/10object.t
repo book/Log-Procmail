@@ -1,6 +1,6 @@
 use strict;
 use Log::Procmail;
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 my $log = Log::Procmail->new;
 isa_ok( $log, "Log::Procmail" );
@@ -32,3 +32,7 @@ is( $log->errors, 0,  "errors() is 0" );
 is( $log->errors( 1 ), 1, "set errors()" );
 is( $log->errors, 1, "get errors()");
 
+# test select()
+$log = Log::Procmail->new( 't/procmail.log' );
+is( $log->select->can_read, 1, "One file to read from" );
+is( ($log->select->can_read)[0], $log->fh, "We can read from our file" );
