@@ -14,3 +14,4 @@ t/procmail.log
 t/procmail2.log
 t/procmail3.log
 t/procmail4.log
+META.yml                                 Module meta-data (added by MakeMaker)
