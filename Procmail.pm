@@ -1,10 +1,11 @@
 package Log::Procmail;
 
-require 5.6.0;
+require 5.005;
 use strict;
-use warnings;
+use vars qw/ $VERSION /;
+local $^W = 1;
 
-our $VERSION = '0.01';
+$VERSION = '0.01';
 
 =head1 NAME
 

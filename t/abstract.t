@@ -90,7 +90,7 @@ $rec = $log->next;
 ok( $rec->from,    'e10299@firemail.de' );
 ok( $rec->folder,  '/var/spool/mail/book' );
 $rec = $log->next;
-ok( $rec, undef );
+ok( defined $rec, '' );
 
 # a new mail arrives
 open F, ">> t/log.tmp" or die;
