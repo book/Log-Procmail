@@ -145,6 +145,11 @@ sub push {
     push @{ $log->{files} }, @_;
 }
 
+sub DESTROY {
+    my $self = shift;
+    if( $self->{fh}->opened ) { $self->{fh}->close }
+}
+
 =back
 
 =head2 Log::Procmail::Abstract
@@ -203,6 +208,12 @@ sub AUTOLOAD {
 }
 
 =back
+
+=head1 BUGS
+
+Please report all bugs through the rt.cpan.org interface:
+
+http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Procmail
 
 =head1 AUTHOR
 
