@@ -1,5 +1,10 @@
 Revision history for Perl extension Log::Procmail.
 
+0.05  Sat Jan 11 18:29:33 CET 2003
+        - changed the sort order in mailstat.pl
+        - few cosmetic changes
+        - lots of thanks
+
 0.04  Fri Jul 26 15:58:15 CEST 2002
         - better handling of the mix of tabs and spaces in procmail logs
         - errors() allows the return of unrecognized lines (errors)
@@ -7,15 +12,15 @@ Revision history for Perl extension Log::Procmail.
         - ymd() croaks if used to modify the date
 
 0.03  Thu Jul 25 16:34:35 CEST 2002
-	- new ymd() method, that return dates that are easy to sort
+        - new ymd() method, that return dates that are easy to sort
         - Corrected a slight bug when using isa() on a string that
-	  doesn't start by a letter (e.g. an absolute filename)
+          doesn't start by a letter (e.g. an absolute filename)
 
 0.02  Fri Feb 22 23:38:11 CET 2002
         - the Log::Procmail object can now read from filehandles
           (like \*STDIN) or IO::Handle objects.
 
 0.01  Sun Feb  3 15:02:16 CET 2002
-	- original version; created by h2xs 1.20 with options
-		-AX -n Log::Procmail
+        - original version; created by h2xs 1.20 with options
+        -AX -n Log::Procmail
 
