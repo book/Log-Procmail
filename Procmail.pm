@@ -2,11 +2,10 @@ package Log::Procmail;
 
 require 5.005;
 use strict;
-use Carp;
 use vars qw/ $VERSION /;
 local $^W = 1;
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 my %month;
 @month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec / } = (0..11);
@@ -194,6 +193,7 @@ Log::Procmail::next() returns a Log::Procmail::Abstract object.
 
 package Log::Procmail::Abstract;
 
+use Carp;
 use vars '$AUTOLOAD';
 
 sub new {
@@ -246,8 +246,8 @@ you think it is. C<;-)> This method is read-only.
 
 sub ymd {
     my $self = shift;
-    #croak "Log::Procmail::Abstract::ymd cannot be used to set the date"
-    #  if shift;
+    croak("Log::Procmail::Abstract::ymd cannot be used to set the date")
+      if @_;
     $self->{date} =~ /^... (...) (..) (..):(..):(..) .*(\d\d\d\d)$/;
     return sprintf( "%04d%02d%02d$3$4$5", $6, $month{$1}+1, $2 );
 }
@@ -259,6 +259,8 @@ sub ymd {
 The Log::Procmail object should be able to read from STDIN.
 
 =head1 BUGS
+
+The ymd() method should be smarter.
 
 Please report all bugs through the rt.cpan.org interface:
 
