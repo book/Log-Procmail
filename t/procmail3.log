@@ -11,3 +11,5 @@ procmail: Error while writing to "qmail-perms"
 From eipja@inet.com.ua Wed Oct 11 07:23:07 2000
  Subject: Start Making What Your Worth!                         8545
   Folder: qmail-perms ./mail/inbox/					   2641
+Can't call method "print" on an undefined value at /usr/bin/qmail-perms line 97.
+procmail: Error while writing to "qmail-perms"
