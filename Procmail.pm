@@ -8,7 +8,7 @@ use Carp;
 use vars qw/ $VERSION /;
 local $^W = 1;
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 my %month;
 @month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec /} = ( 0 .. 11 );
@@ -89,7 +89,7 @@ With errors enabled, you have to check that next() actually returns a
 Log::Procmail::Abstract object. Here's is an example:
 
     $log->errors(1);
-     
+
     # fetch data
     while ( $rec = $log->next ) {
 
@@ -259,30 +259,16 @@ subject(), folder() and size(). They return the relevant information
 when called without argument, and set it to their first argument
 otherwise.
 
- # count mail received per folder
- while( $rec = $log->next ) { $folder{ $rec->folder }++ }
+    # count mail received per folder
+    while( $rec = $log->next ) { $folder{ $rec->folder }++ }
 
 =cut
 
-sub AUTOLOAD {
-
-    # don't DESTROY
-    return if $AUTOLOAD =~ /::DESTROY/;
-
-    # fetch the attribute name
-    $AUTOLOAD =~ /.*::(\w+)/;
-    my $attr = $1;
-    if ( $attr eq lc $attr ) {    # accessors are lowercase
-        no strict 'refs';
-
-        # create the method
-        *{$AUTOLOAD} = sub {
-            my $self = shift;
-            @_ ? $self->{$attr} = shift: $self->{$attr};
-        };
-
-        # now do it
-        goto &{$AUTOLOAD};
+for my $attr (qw( from date subject size folder ) ) {
+    no strict 'refs';
+    *{"Log::Procmail::Abstract::$attr"} = sub {
+        my $self = shift;
+        @_ ? $self->{$attr} = shift: $self->{$attr};
     }
 }
 
