@@ -57,8 +57,9 @@ will return the new records.
 sub new {
     my $class = shift;
     return bless {
-        fh    => new IO::File,
-        files => [@_],
+        fh     => new IO::File,
+        files  => [@_],
+        errors => 0,
     }, $class;
 }
 
@@ -101,7 +102,6 @@ sub next {
     my $read;
     READ: {
         while (<$fh>) {
-            /^procmail: / && next;    # ignore debug comments
             $read++;
 
             # should carp if doesn't get what's expected
@@ -111,12 +111,14 @@ sub next {
                 # assert: $read == 1;
                 $rec->from($1);
                 $rec->date($2);
+                next;
             };
 
             # assert: $read == 2;
-            /^ Subject: (.*)/ && do { $rec->subject($1) };
+            /^ Subject: (.*)/i && do { $rec->subject($1); next; };
 
             # procmail tabulates with tabs and spaces... :-(
+            # assert: $read == 3;
             /^  Folder: (.*?)\s+(\d+)$/ && do {
 
                 # assert: $read == 3;
@@ -124,9 +126,18 @@ sub next {
                 $rec->size($2);
                 last;
             };
+
+            # fall through: some error message
+            # shall we ignore it?
+            next unless $log->{errors};
+
+            # or return it?
+            chomp;
+            $rec = $_;
+            last;
         }
 
-        # in case we couldn't read a line
+        # in case we couldn't read the first line
         if ( !$read ) {
 
             # go to next file
@@ -156,6 +167,21 @@ and keeps returning abstracts.
 sub push {
     my $log = shift;
     push @{ $log->{files} }, @_;
+}
+
+=item $log->errors( [bool] );
+
+Set or get the error flag. If set, when the next() method will return
+the string found in the log file, instead of ignoring it. Be careful:
+it is a simple string, not a Log::Procmail::Abstract object.
+
+Default is to return no error.
+
+=cut
+
+sub errors {
+    my $self = shift;
+    @_ ? $self->{errors} = shift: $self->{errors};
 }
 
 # *internal method*
