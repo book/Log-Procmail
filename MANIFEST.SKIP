@@ -17,3 +17,4 @@ CVS/.*
 \.SKIP$
 \.cvsignore$
 ^TODO$
+^t/01pod.t$
