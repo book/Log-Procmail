@@ -8,10 +8,12 @@ use Carp;
 use vars qw/ $VERSION /;
 local $^W = 1;
 
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 my %month;
 @month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec /} = ( 0 .. 11 );
+
+my $DATE = qr/(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([ \d]\d) (\d\d):(\d\d):(\d\d) .*(\d\d\d\d)/;
 
 =head1 NAME
 
@@ -130,7 +132,7 @@ sub next {
             # (From, then Subject, then Folder)
 
             # From create a new Abstract
-            /^From\s+(\S+)\s+(.*)/ && do {
+            /^From (.+?) +($DATE)$/o && do {
                 push @{$log->{buffer}}, Log::Procmail::Abstract->new;
 
                 # assert: $read == 1;
@@ -314,7 +316,7 @@ sub ymd {
     croak("Log::Procmail::Abstract::ymd cannot be used to set the date")
       if @_;
     return undef unless defined $self->{date};
-    $self->{date} =~ /^... (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([ \d]\d) (\d\d):(\d\d):(\d\d) .*(\d\d\d\d)$/;
+    $self->{date} =~ /^$DATE$/o;
     return undef unless $1;
     return sprintf( "%04d%02d%02d$3$4$5", $6, $month{$1} + 1, $2 );
 }
