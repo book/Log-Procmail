@@ -5,7 +5,7 @@ use strict;
 use vars qw/ $VERSION /;
 local $^W = 1;
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 my %month;
 @month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec /} = ( 0 .. 11 );
@@ -305,7 +305,7 @@ being the only user of this module. Many thanks to Michael Schwern for
 insisting so much on the importance of tests and documentation.
 
 Many thanks to "Les Mongueurs de Perl" for making cvs.mongueurs.net
-available for Log-Procmail and many other projects.
+available for Log::Procmail and many other projects.
 
 =head1 COPYRIGHT 
 
