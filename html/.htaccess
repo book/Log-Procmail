@@ -1,0 +1,3 @@
+Options +Indexes
+IndexOptions FancyIndexing
+AddDescription "CVS Repository snapshot" log-procmail-HEAD.tar.gz
