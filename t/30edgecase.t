@@ -1,4 +1,4 @@
-use Test::More tests => 30;
+use Test::More tests => 31;
 use Log::Procmail;
 
 # a file with actual bad logs
@@ -11,6 +11,10 @@ is( $rec->date,    'Tue Apr  6 02:48:11 2004',         'Correct date' );
 is( $rec->subject, 'Viagra that last all weekend',     'Correct subject' );
 is( $rec->folder,  'spam',                             'Correct folder' );
 is( $rec->size,    2726,                               'Correct size' );
+
+# change the date (see rt ticket #2658)
+$rec->date( "foo bar" );
+is( $rec->ymd, undef, "ymd() returns undef when the date is incorrect" );
 
 # next two logs are mixed up
 # but the first log does not have a Folder line
