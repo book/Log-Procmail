@@ -8,6 +8,8 @@ t/00basic.t
 t/01pod.t
 t/10object.t
 t/20abstract.t
+t/30edgecase.t
+t/50mailstat.t
 t/procmail.log
 t/procmail2.log
 t/procmail3.log
