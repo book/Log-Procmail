@@ -1,5 +1,14 @@
 Revision history for Perl extension Log::Procmail.
 
+0.06  Sun Apr 18 02:12:06 CEST 2004
+        - fully use Test::More for the test suite
+        - removed AUTOLOADed methods in Log::Procmail::Abstract
+        - Return incomplete log lines when some fields are missing
+          or lines are mixed up
+        - ymd() returns undef when the date field is not good
+        - source() returns the log file name or stringified handle
+        - a new test suite to compare mailstat.pl and mailstat
+
 0.05  Sat Jan 11 18:29:33 CET 2003
         - changed the sort order in mailstat.pl
         - few cosmetic changes
