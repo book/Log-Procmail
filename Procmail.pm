@@ -271,7 +271,6 @@ Log::Procmail::next() returns a Log::Procmail::Abstract object.
 package Log::Procmail::Abstract;
 
 use Carp;
-use vars '$AUTOLOAD';
 
 sub new {
     my $class = shift;
