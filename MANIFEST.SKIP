@@ -14,5 +14,6 @@ CVS/.*
 ^html/
 ~$
 (^|/)\.#
-^MANIFEST.SKIP$
+\.SKIP$
+\.cvsignore$
 ^TODO$

@@ -4,6 +4,7 @@ Makefile.PL
 Procmail.pm
 README
 mailstat.pl
+t/00basic.t
 t/abstract.t
 t/object.t
 t/procmail.log
