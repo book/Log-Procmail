@@ -8,3 +8,4 @@ t/abstract.t
 t/object.t
 t/procmail.log
 t/procmail2.log
+t/procmail3.log
