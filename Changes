@@ -1,5 +1,10 @@
 Revision history for Perl extension Log::Procmail.
 
+0.09 Wed Jan 19 01:42:16 CET 2005
+        - backport to perl 5.005 (Thanks to Mathieu Arnold)
+        - can_read() does not work for files on Win32,
+          so select() now returns undef on those systems
+
 0.08  Mon Apr 26 14:55:41 CEST 2004
         - the fh() method returns a filehandle to the currently opened
           log file
