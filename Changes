@@ -1,5 +1,10 @@
 Revision history for Perl extension Log::Procmail.
 
+0.07  Mon Apr 26 00:31:58 CEST 2004
+        - support From addresses with spaces inside (darn spammers)
+        - moved all files to lib/ and scripts, so as to avoid installing
+          mailstat.pl in the same directory as Procmail.pm
+
 0.06  Sun Apr 18 02:12:06 CEST 2004
         - fully use Test::More for the test suite
         - removed AUTOLOADed methods in Log::Procmail::Abstract
