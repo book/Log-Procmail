@@ -299,8 +299,10 @@ http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Procmail
 Philippe "BooK" Bruhat <book@cpan.org>.
 
 Thanks to Briac "Oeufmayo" Pilpré and David "Sniper" Rigaudiere for early
-comments on irc. Many thanks to Michael Schwern for insisting so much on the
-importance of tests and documentation.
+comments on irc. Thanks to Olivier "rs" Poitrey for giving me his huge
+procmail log file (51 Mb spanning over a two-year period) and for probably
+being the only user of this module. Many thanks to Michael Schwern for
+insisting so much on the importance of tests and documentation.
 
 Many thanks to "Les Mongueurs de Perl" for making cvs.mongueurs.net
 available for Log-Procmail and many other projects.
