@@ -2,7 +2,12 @@
 use strict;
 use Log::Procmail;
 use Getopt::Std;
+use POSIX qw( strftime );
 use vars qw/ %opt /;
+
+%opt = (
+    oldsuffix => '.old',
+);
 
 =head1 NAME
 
@@ -53,20 +58,74 @@ silent in case of no mail
 
 =cut
 
-getopts( 'hklmots', \%opt );
+getopts( '?hklmots', \%opt ) or usage();
 
-# usage
-if( $opt{h} ) {
-    ( my $usage =<< '    USAGE' ) =~ s/^    //gm;
-    Usage: mailstat [-klmots] [logfile]
-         -k      keep logfile intact
-         -l      long display format
-         -m      merge any errors into one line
-         -o      use the old logfile
-         -t      terse display format
-         -s      silent in case of no mail
-    USAGE
-    print STDERR $usage;
+# -h or -?
+usage(1) if $opt{h} or $opt{'?'};
+
+# the filename
+my $logfile = shift || '';
+my $oldlogfile;
+
+# if the file is the old file
+if ( $logfile =~ /$opt{oldsuffix}$/o ) {
+    $opt{k} = 1;
+    $oldlogfile = $logfile;
+}
+else { $oldlogfile = $logfile . $opt{oldsuffix} }
+
+# -o      use the old logfile
+$logfile = $oldlogfile if $opt{o};
+
+if ( $logfile ne '-' and $logfile ne '' ) {
+    if ( -z $logfile ) {
+        if ( !$opt{s} ) {
+            if ( -f $logfile ) {
+                print 'No mail arrived since ', strftime( "%b %d %H:%M\n",
+                    localtime( ( stat($logfile) )[9] ) );
+            }
+            else { print "Can't find your LOGFILE=$logfile"; }
+        }
+        exit 1;
+    }
+}
+else {
+    if ( $logfile ne '-' and -t ) {
+        print STDERR
+          "Most people don't type their own logfiles;  but, what do I care?\n";
+        $opt{t} = 1;
+    }
+    $opt{k} = 1;
+    $logfile = '';
+}
+
+# -k      keep logfile intact
+if ( !$opt{k} ) {
+    rename $logfile, $oldlogfile;
+    open F, ">> $logfile" or die "Unable to open $logfile: $!";
+    print F '';
+    close F;
+}
+else { $oldlogfile = $logfile }
+
+# -l      long display format
+# -m      merge any errors into one line
+# -t      terse display format
+# -s      silent in case of no mail
+
+# the usage function
+sub usage {
+    print STDERR "Usage: mailstat [-klmots] [logfile]\n";
+    if (shift) {
+        print STDERR << 'USAGE';
+     -k      keep logfile intact
+     -l      long display format
+     -m      merge any errors into one line
+     -o      use the old logfile
+     -t      terse display format
+     -s      silent in case of no mail
+USAGE
+    }
     exit 64;
 }
 
@@ -99,3 +158,4 @@ and/or modified under the terms of the Perl Artistic License
 L<perl>, L<Log::Procmail>.
 
 =cut
+
