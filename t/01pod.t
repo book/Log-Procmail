@@ -1,7 +1,7 @@
 use Test::More;
 use File::Find;
 
-my @files = qw( mailstat.pl );
+my @files = qw( scripts/mailstat.pl );
 find( sub { push @files, $File::Find::name if /\.p(?:m|od)$/ }, 'blib/lib' );
 
 plan tests => scalar @files;

@@ -29,7 +29,7 @@ SKIP: {
 
         # arguments for each script
         my @orig = ( prog => $mailstat );
-        my @perl = ( prog => './mailstat.pl', interpreter => $^X );
+        my @perl = ( prog => './scripts/mailstat.pl', interpreter => $^X );
 
         # compare outpur, errput and status code for all combinations
         for my $file ( @files ) {
