@@ -9,7 +9,7 @@ use Carp;
 use vars qw/ $VERSION /;
 local $^W = 1;
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 my %month;
 @month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec /} = ( 0 .. 11 );
