@@ -15,6 +15,8 @@ plan tests => $tests;
 
 SKIP: {
     eval { require Test::Cmd; };
+    skip "mailstat does not exist on $^O", $tests
+      if $^O =~ /^(?:dos|os2|MSWin32)/;
     skip "Test::Cmd not installed", $tests if $@;
 
     my $mailstat;
