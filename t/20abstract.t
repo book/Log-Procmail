@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 58;
+use Test::More tests => 63;
 use Log::Procmail;
 
 # create a record by hand
@@ -37,6 +37,14 @@ is( $rec->folder, '/var/spool/mail/book', "Correct folder" );
 is( $rec->size, 5774, "Correct size" );
 is( $rec->source, 't/procmail.log', "Correct source" );
 
+# a record with a <SPACE> in the From field
+$rec = $log->next;
+is( $rec->from, '"antispamsoftware <antispam"@mx05.sytes.net', "Correct from");
+is( $rec->date, 'Mon Apr  5 23:01:10 2004', "Correct date" );
+is( $rec->subject, 'Filter spammers and keep your email address', "Correct subject");
+is( $rec->folder, "isspam", "Correct folder");
+is( $rec->size, 7528, "Correct size" );
+
 # read the remaining records
 my $i = 1;
 while ( $rec = $log->next ) { $i++ }
@@ -58,7 +66,7 @@ is( $rec->size, 5774, "Correct size" );
 is( $rec->source, 't/procmail.log', "Correct source" );
 
 # go to next file, automatically
-$rec = $log->next for 1 .. 5;    # skip 5 records
+$rec = $log->next for 1 .. 6;    # skip 6 records
 
 is( $rec->from, 'p11542@24horas.com', "Correct from" );
 is( $rec->date, 'Mon Feb  4 18:29:00 2002', "Correct date" );
