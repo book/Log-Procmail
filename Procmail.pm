@@ -8,7 +8,7 @@ local $^W = 1;
 $VERSION = '0.04';
 
 my %month;
-@month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec / } = (0..11);
+@month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec /} = ( 0 .. 11 );
 
 =head1 NAME
 
@@ -114,8 +114,10 @@ sub next {
             };
 
             # assert: $read == 2;
-            /^ Subject: (.*)/          && do { $rec->subject($1) };
-            /^  Folder: (\S+)\s+(\d+)/ && do {
+            /^ Subject: (.*)/ && do { $rec->subject($1) };
+
+            # procmail tabulates with tabs and spaces... :-(
+            /^  Folder: (.*?)\s+(\d+)$/ && do {
 
                 # assert: $read == 3;
                 $rec->folder($1);
@@ -249,7 +251,7 @@ sub ymd {
     croak("Log::Procmail::Abstract::ymd cannot be used to set the date")
       if @_;
     $self->{date} =~ /^... (...) (..) (..):(..):(..) .*(\d\d\d\d)$/;
-    return sprintf( "%04d%02d%02d$3$4$5", $6, $month{$1}+1, $2 );
+    return sprintf( "%04d%02d%02d$3$4$5", $6, $month{$1} + 1, $2 );
 }
 
 =back
