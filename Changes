@@ -1,5 +1,11 @@
 Revision history for Perl extension Log::Procmail.
 
+0.04  Fri Jul 26 15:58:15 CEST 2002
+        - better handling of the mix of tabs and spaces in procmail logs
+        - errors() allows the return of unrecognized lines (errors)
+        - added a working mailstat.pl script
+        - ymd() croaks if used to modify the date
+
 0.03  Thu Jul 25 16:34:35 CEST 2002
 	- new ymd() method, that return dates that are easy to sort
         - Corrected a slight bug when using isa() on a string that
