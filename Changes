@@ -1,6 +1,10 @@
 Revision history for Perl extension Log::Procmail.
 
-0.09 Wed Jan 19 01:42:16 CET 2005
+0.10  Mon Mar 28 16:22:51 CEST 2005
+        - added META.yml and made t/01pod.t be seen by CPANTS
+        - this is only a kwalitee-raising release, move along, nothing to see
+
+0.09  Wed Jan 19 01:42:16 CET 2005
         - backport to perl 5.005 (Thanks to Mathieu Arnold)
         - can_read() does not work for files on Win32,
           so select() now returns undef on those systems
