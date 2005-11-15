@@ -1,5 +1,13 @@
 Revision history for Perl extension Log::Procmail.
 
+0.11 Tue Nov 15 19:10:26 CET 2005
+        - moved all the documentation at the end of the module and script
+        - added a Build.PL script
+        - Enrico Sorcinelli (bepi) sent me a log file that
+          Log::Procmail couldn't parse correctly. It does now.
+        - mailstat.pl works like mailstat(1) when given an empty file
+          (except for the shell error message)
+
 0.10  Mon Mar 28 16:22:51 CEST 2005
         - added META.yml and made t/01pod.t be seen by CPANTS
         - this is only a kwalitee-raising release, move along, nothing to see
