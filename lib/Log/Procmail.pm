@@ -5,6 +5,7 @@ use strict;
 use IO::File;
 use IO::Select;
 use Carp;
+use UNIVERSAL ();
 
 use vars qw/ $VERSION /;
 local $^W = 1;
@@ -102,7 +103,7 @@ sub next {
 
     # we have an abstract
     my $rec = shift @{$log->{buffer}};
-    if($rec->isa( 'Log::Procmail::Abstract')) {
+    if(UNIVERSAL::isa( $rec, 'Log::Procmail::Abstract')) {
         # the folder field is required
         goto READ unless defined $rec->folder;
         $rec->{source} = $log->{source};
