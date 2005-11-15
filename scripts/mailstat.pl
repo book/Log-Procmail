@@ -85,9 +85,9 @@ if ( $logfile ne '-' and $logfile ne '' ) {
     if ( ! -s $logfile ) {
         if ( !$opt{s} ) {
             if ( -f $logfile ) {
-                print 'No mail arrived since ',
-                  strftime( "%b %d %H:%M\n",
+                my $time = !-e $oldlogfile ? "\n" : strftime( " %b %d %H:%M\n",
                     localtime( ( stat($oldlogfile) )[9] ) );
+                print 'No mail arrived since', $time;
             }
             else { print "Can't find your LOGFILE=$logfile\n";  }
         }
