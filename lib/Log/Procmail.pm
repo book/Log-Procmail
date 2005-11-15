@@ -30,10 +30,12 @@ sub next {
     my $log = shift;    # who needs $self?
 
     # try to read a record (3 lines)
-    my $fh  = $log->fh;
+    my $fh  = $log->fh();
   READ:
     {
         my $read;
+
+      LINE:
         while (<$fh>) {
             $read++;
 
@@ -42,7 +44,7 @@ sub next {
 
             # From create a new Abstract
             /^From (.+?) +($DATE)$/o && do {
-                push @{$log->{buffer}}, Log::Procmail::Abstract->new;
+                push @{$log->{buffer}}, Log::Procmail::Abstract->new();
 
                 # assert: $read == 1;
                 $log->{buffer}[-1]->from($1);
@@ -50,22 +52,22 @@ sub next {
 
                 # return ASAP
                 last READ if @{$log->{buffer}} > 1;
-                next;
+                next LINE;
             };
 
             # assert: $read == 2;
             /^ Subject: (.*)/i && do {
-                push @{$log->{buffer}}, Log::Procmail::Abstract->new
+                push @{$log->{buffer}}, Log::Procmail::Abstract->new()
                     unless @{$log->{buffer}};
                 $log->{buffer}[0]->subject($1);
-                next;
+                next LINE;
             };
 
             # procmail tabulates with tabs and spaces... :-(
             # assert: $read == 3;
             # Folder means the end of this record
             /^  Folder: (.*?)\s+(\d+)$/ && do {
-                push @{$log->{buffer}}, Log::Procmail::Abstract->new
+                push @{$log->{buffer}}, Log::Procmail::Abstract->new()
                   unless @{$log->{buffer}};
 
                 # assert: $read == 3;
@@ -76,12 +78,12 @@ sub next {
 
             # fall through: some error message
             # shall we ignore it?
-            next unless $log->{errors};
+            next LINE unless $log->{errors};
 
             # or return it?
             chomp;
             push @{$log->{buffer}}, $_;
-            last;
+            last LINE;
         }
 
         # in case we couldn't read the first line
@@ -106,7 +108,7 @@ sub next {
         $rec->{source} = $log->{source};
     }
 
-    return $rec
+    return $rec;
 }
 
 sub push {
@@ -116,19 +118,19 @@ sub push {
 
 sub errors {
     my $self = shift;
-    @_ ? $self->{errors} = shift: $self->{errors};
+    return @_ ? $self->{errors} = shift() : $self->{errors};
 }
 
 sub fh {
     my $log = shift;
-    $log->_open_next unless $log->{fh}->opened;
-    $log->{fh};
+    $log->_open_next unless $log->{fh}->opened();
+    return $log->{fh};
 }
 
 sub select {
     my $log = shift;
-    $log->fh; # make sure the file is correctly opened and select is updated
-    $log->{select};
+    $log->fh(); # make sure the file is correctly opened and select is updated
+    return $log->{select};
 }
 
 # *internal method*
