@@ -1,8 +1,9 @@
+Build.PL
 Changes
 lib/Log/Procmail.pm
 Makefile.PL
-MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST			This list of files
+META.yml
 README
 scripts/mailstat.pl
 t/00basic.t
