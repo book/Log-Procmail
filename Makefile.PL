@@ -7,4 +7,5 @@ WriteMakefile(
     'PREREQ_PM'    => { Test::More => 0 },
     'EXE_FILES'    => [ 'scripts/mailstat.pl' ],
     'AUTHOR'       => 'Philippe "BooK" Bruhat <book@cpan.org>',
+    'PL_FILES'     => {},
 );
