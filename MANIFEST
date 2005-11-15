@@ -12,7 +12,9 @@ t/10object.t
 t/20abstract.t
 t/30edgecase.t
 t/50mailstat.t
+t/empty.log
 t/procmail.log
 t/procmail2.log
 t/procmail3.log
 t/procmail4.log
+t/procmail5.log
