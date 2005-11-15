@@ -16,47 +16,6 @@ my %month;
 
 my $DATE = qr/(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([ \d]\d) (\d\d):(\d\d):(\d\d) .*(\d\d\d\d)/;
 
-=head1 NAME
-
-Log::Procmail - Perl extension for reading procmail logfiles.
-
-=head1 SYNOPSIS
-
-    use Log::Procmail;
-
-    my $log = new Log::Procmail 'procmail.log';
-
-    # loop on every abstract
-    while(my $rec = $log->next) {
-        # do something with $rec->folder, $rec->size, etc.
-    }
-
-=head1 DESCRIPTION
-
-=head2 Log::Procmail
-
-Log::Procmail reads procmail(1) logfiles and returns the abstracts one by one.
-
-=over 4
-
-=item $log = Log::Procmail->new( @files );
-
-Constructor for the procmail log reader.  Returns a reference to a
-Log::Procmail object.
-
-The constructor accepts a list of file as parameter. This allows you to
-read records from several files in a row:
-
-    $log = Log::Procmail->new( "$ENV{HOME}/.procmail/log.2",
-                               "$ENV{HOME}/.procmail/log.1",
-                               "$ENV{HOME}/.procmail/log", );
-
-When $log reaches the end of the file "log", it doesn't close the file.
-So, after B<procmail> processes some incoming mail, the next call to next()
-will return the new records.
-
-=cut
-
 sub new {
     my $class = shift;
     return bless {
@@ -66,48 +25,6 @@ sub new {
         buffer => [],
     }, $class;
 }
-
-=item $rec = $log->next
-
-Return a Log::Procmail::Abstract object that represent an entry in the log
-file. Return undef if there is no record left in the file.
-
-When the Log::Procmail object reaches the end of a file, and this file is
-not the last of the stack, it closes the current file and opens the next
-one.
-
-When it reaches the end of the last file, the file is not closed. Next
-time the record method is called, it will check again in case new abstracts
-were appended.
-
-Procmail(1) log look like the following:
-
-    From karen644552@btinternet.com  Fri Feb  8 20:37:24 2002
-     Subject: Stock Market Volatility Beating You Up? (18@2)
-      Folder: /var/spool/mail/book						   2840
-
-Some informational messages can be put by procmail(1) in the log file.
-If the C<errors> attribute is true, these lines are returned one at a time.
-
-With errors enabled, you have to check that next() actually returns a
-Log::Procmail::Abstract object. Here is an example:
-
-    $log->errors(1);
-
-    # fetch data
-    while ( $rec = $log->next ) {
-
-        # if it's an error line
-        if ( !ref $rec ) {
-            # this is not a log, but an informational message
-            # do something with it
-            next;
-        }
-
-        # normal log processing
-    }
-
-=cut
 
 sub next {
     my $log = shift;    # who needs $self?
@@ -192,61 +109,21 @@ sub next {
     return $rec
 }
 
-=item $log->push( $file [, $file2 ...] );
-
-Push one or more files on top of the list of log files to examine.
-When Log::Procmail runs out of abstracts to return (i.e. it reaches the
-end of the file), it transparently opens the next file (if there is one)
-and keeps returning new abstracts.
-
-=cut
-
 sub push {
     my $log = shift;
     push @{ $log->{files} }, @_;
 }
-
-=item $log->errors( [bool] );
-
-Set or get the error flag. If set, when the next() method will return
-the string found in the log file, instead of ignoring it. Be careful:
-it is a simple string, not a Log::Procmail::Abstract object.
-
-Default is to return no error.
-
-=cut
 
 sub errors {
     my $self = shift;
     @_ ? $self->{errors} = shift: $self->{errors};
 }
 
-=item $fh = $log->fh()
-
-Returns the currently opened filehandle, from which the next call to
-C<next()> will try to read a record.
-
-=cut
-
 sub fh {
     my $log = shift;
     $log->_open_next unless $log->{fh}->opened;
     $log->{fh};
 }
-
-=item $select = $log->select()
-
-Return a IO::Select object that watches the currently opened filehandle.
-
-B<You are not supposed to use C<add()> or C<remove()> on the returned
-IO::Select object.>
-
-B<Additional warning for C<MSWin32>, C<NetWare>, C<dos>, C<VMS>, C<riscos>
-and C<beos>:> on those systems, C<select()> returns C<undef>.
-(Check F<ext/IO/t/io_sel.t> in the Perl sources for details.
-Hint: look for the message I<4-arg select is only valid on sockets>.)
-
-=cut
 
 sub select {
     my $log = shift;
@@ -287,6 +164,151 @@ sub DESTROY {
     if ( $self->{fh} && $self->{fh}->opened ) { $self->{fh}->close }
 }
 
+#
+# a small class for the abstracts themselves
+#
+package Log::Procmail::Abstract;
+
+use Carp;
+
+sub new {
+    my $class = shift;
+    return bless {@_}, $class;
+}
+
+for my $attr (qw( from date subject size folder source ) ) {
+    no strict 'refs';
+    *$attr = sub {
+        my $self = shift;
+        @_ ? $self->{$attr} = shift: $self->{$attr};
+    }
+}
+
+sub ymd {
+    my $self = shift;
+    croak("Log::Procmail::Abstract::ymd cannot be used to set the date")
+      if @_;
+    return undef unless defined $self->{date};
+    $self->{date} =~ /^$DATE$/o;
+    return undef unless $1;
+    return sprintf( "%04d%02d%02d$3$4$5", $6, $month{$1} + 1, $2 );
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Log::Procmail - Perl extension for reading procmail logfiles.
+
+=head1 SYNOPSIS
+
+    use Log::Procmail;
+
+    my $log = new Log::Procmail 'procmail.log';
+
+    # loop on every abstract
+    while(my $rec = $log->next) {
+        # do something with $rec->folder, $rec->size, etc.
+    }
+
+=head1 DESCRIPTION
+
+=head2 Log::Procmail
+
+Log::Procmail reads procmail(1) logfiles and returns the abstracts one by one.
+
+=over 4
+
+=item $log = Log::Procmail->new( @files );
+
+Constructor for the procmail log reader.  Returns a reference to a
+Log::Procmail object.
+
+The constructor accepts a list of file as parameter. This allows you to
+read records from several files in a row:
+
+    $log = Log::Procmail->new( "$ENV{HOME}/.procmail/log.2",
+                               "$ENV{HOME}/.procmail/log.1",
+                               "$ENV{HOME}/.procmail/log", );
+
+When $log reaches the end of the file "log", it doesn't close the file.
+So, after B<procmail> processes some incoming mail, the next call to next()
+will return the new records.
+
+=item $rec = $log->next
+
+Return a Log::Procmail::Abstract object that represent an entry in the log
+file. Return undef if there is no record left in the file.
+
+When the Log::Procmail object reaches the end of a file, and this file is
+not the last of the stack, it closes the current file and opens the next
+one.
+
+When it reaches the end of the last file, the file is not closed. Next
+time the record method is called, it will check again in case new abstracts
+were appended.
+
+Procmail(1) log look like the following:
+
+    From karen644552@btinternet.com  Fri Feb  8 20:37:24 2002
+     Subject: Stock Market Volatility Beating You Up? (18@2)
+      Folder: /var/spool/mail/book						   2840
+
+Some informational messages can be put by procmail(1) in the log file.
+If the C<errors> attribute is true, these lines are returned one at a time.
+
+With errors enabled, you have to check that next() actually returns a
+Log::Procmail::Abstract object. Here is an example:
+
+    $log->errors(1);
+
+    # fetch data
+    while ( $rec = $log->next ) {
+
+        # if it's an error line
+        if ( !ref $rec ) {
+            # this is not a log, but an informational message
+            # do something with it
+            next;
+        }
+
+        # normal log processing
+    }
+
+=item $log->push( $file [, $file2 ...] );
+
+Push one or more files on top of the list of log files to examine.
+When Log::Procmail runs out of abstracts to return (i.e. it reaches the
+end of the file), it transparently opens the next file (if there is one)
+and keeps returning new abstracts.
+
+=item $log->errors( [bool] );
+
+Set or get the error flag. If set, when the next() method will return
+the string found in the log file, instead of ignoring it. Be careful:
+it is a simple string, not a Log::Procmail::Abstract object.
+
+Default is to return no error.
+
+=item $fh = $log->fh()
+
+Returns the currently opened filehandle, from which the next call to
+C<next()> will try to read a record.
+
+=item $select = $log->select()
+
+Return a IO::Select object that watches the currently opened filehandle.
+
+B<You are not supposed to use C<add()> or C<remove()> on the returned
+IO::Select object.>
+
+B<Additional warning for C<MSWin32>, C<NetWare>, C<dos>, C<VMS>, C<riscos>
+and C<beos>:> on those systems, C<select()> returns C<undef>.
+(Check F<ext/IO/t/io_sel.t> in the Perl sources for details.
+Hint: look for the message I<4-arg select is only valid on sockets>.)
+
 =back
 
 =head2 Log::Procmail::Abstract
@@ -297,17 +319,6 @@ all this can be accessed and modified through the from(), date(), subject(),
 folder() and size() methods.
 
 Log::Procmail::next() returns a Log::Procmail::Abstract object.
-
-=cut
-
-package Log::Procmail::Abstract;
-
-use Carp;
-
-sub new {
-    my $class = shift;
-    return bless {@_}, $class;
-}
 
 =over 4
 
@@ -324,32 +335,10 @@ otherwise.
 The source() accessor returns the name of the log file or the string
 representation of the handle, if a filehandle was given.
 
-=cut
-
-for my $attr (qw( from date subject size folder source ) ) {
-    no strict 'refs';
-    *$attr = sub {
-        my $self = shift;
-        @_ ? $self->{$attr} = shift: $self->{$attr};
-    }
-}
-
 =item $rec->ymd()
 
 Return the date in the form C<yyyymmmddhhmmss> where each field is what
 you think it is. C<;-)> This method is read-only.
-
-=cut
-
-sub ymd {
-    my $self = shift;
-    croak("Log::Procmail::Abstract::ymd cannot be used to set the date")
-      if @_;
-    return undef unless defined $self->{date};
-    $self->{date} =~ /^$DATE$/o;
-    return undef unless $1;
-    return sprintf( "%04d%02d%02d$3$4$5", $6, $month{$1} + 1, $2 );
-}
 
 =back
 
@@ -406,11 +395,13 @@ when the file is rotated.
 
 Please report all bugs through the rt.cpan.org interface:
 
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Procmail
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Procmail>
 
 =head1 AUTHOR
 
 Philippe "BooK" Bruhat <book@cpan.org>.
+
+=head1 ACKNOWLEDGMENTS
 
 Thanks to Briac "Oeufmayo" Pilpré and David "Sniper" Rigaudiere for early
 comments on irc. Thanks to Olivier "rs" Poitrey for giving me his huge
@@ -437,4 +428,3 @@ perl(1), procmail(1).
 
 =cut
 
-1;
