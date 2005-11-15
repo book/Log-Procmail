@@ -33,7 +33,7 @@ SKIP: {
         my @orig = ( prog => $mailstat );
         my @perl = ( prog => './scripts/mailstat.pl', interpreter => $^X );
 
-        # compare outpur, errput and status code for all combinations
+        # compare output, errput and status code for all combinations
         for my $file ( @files ) {
             for my $args ( @args ) {
                 $test->run( @orig, args => "$args $file" );
