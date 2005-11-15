@@ -11,55 +11,6 @@ use locale;
     summary   => sub { },
 );
 
-=head1 NAME
-
-mailstat.pl - shows mail-arrival statistics
-
-=head1 SYNOPSIS
-
-mailstat [-klmots] [logfile]
-
-=head1 DESCRIPTION
-
-B<mailstat.pl> example program using Log::Procmail to mimic mailstat(1)
-
-mailstat parses a procmail-generated $LOGFILE and displays a summary about
-the messages delivered to all folders (total size, average size,
-nr of messages). The $LOGFILE is truncated to zero length, unless the
-I<-k> option is used. Exit code 0 if mail arrived, 1 if no mail arrived.
-
-=head1 OPTIONS
-
-=over 4
-
-=item I<-k>
-
-keep logfile intact
-
-=item I<-l>
-
-long display format
-
-=item I<-m>
-
-merge any errors into one line
-
-=item I<-o>
-
-use the old logfile
-
-=item I<-t>
-
-terse display format
-
-=item I<-s>
-
-silent in case of no mail
-
-=back
-
-=cut
-
 getopts( '?hklmots', \%opt ) or usage();
 
 # -h or -?
@@ -195,6 +146,55 @@ USAGE
     exit 64;
 }
 
+__END__
+
+=head1 NAME
+
+mailstat.pl - shows mail-arrival statistics
+
+=head1 SYNOPSIS
+
+mailstat [-klmots] [logfile]
+
+=head1 DESCRIPTION
+
+B<mailstat.pl> example program using Log::Procmail to mimic mailstat(1)
+
+mailstat parses a procmail-generated $LOGFILE and displays a summary about
+the messages delivered to all folders (total size, average size,
+nr of messages). The $LOGFILE is truncated to zero length, unless the
+I<-k> option is used. Exit code 0 if mail arrived, 1 if no mail arrived.
+
+=head1 OPTIONS
+
+=over 4
+
+=item I<-k>
+
+keep logfile intact
+
+=item I<-l>
+
+long display format
+
+=item I<-m>
+
+merge any errors into one line
+
+=item I<-o>
+
+use the old logfile
+
+=item I<-t>
+
+terse display format
+
+=item I<-s>
+
+silent in case of no mail
+
+=back
+
 =head1 NOTES
 
 Customise to your heart's content, this program is only provided
@@ -214,7 +214,7 @@ The original manual page was written by Santiago Vila
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2004, Philippe Bruhat. All Rights Reserved.
+Copyright (c) 2002-2005, Philippe Bruhat. All Rights Reserved.
 
 =head1 LICENSE
 
