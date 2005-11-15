@@ -144,7 +144,7 @@ $log->errors(1);
 my ( $rec, $size, %data, @total );
 
 # fetch data
-while ( $rec = $log->next ) {
+while ( defined( $rec = $log->next ) ) {
 
     # if it's an error line
     if ( !ref $rec ) {
