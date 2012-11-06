@@ -201,6 +201,8 @@ sub ymd {
 
 __END__
 
+=encoding iso-8859-1
+
 =head1 NAME
 
 Log::Procmail - Perl extension for reading procmail logfiles.
