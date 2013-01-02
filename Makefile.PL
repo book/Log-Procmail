@@ -8,4 +8,10 @@ WriteMakefile(
     'EXE_FILES'    => [ 'scripts/mailstat.pl' ],
     'AUTHOR'       => 'Philippe "BooK" Bruhat <book@cpan.org>',
     'PL_FILES'     => {},
+    META_MERGE => {
+        resources => {  
+            repository => 'http://github.com/book/Log-Procmail',
+        },
+    },      
+
 );

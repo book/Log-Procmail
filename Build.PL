@@ -12,6 +12,11 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup      => [ 'Log-Procmail-*' ],
     script_files        => [ 'scripts/mailstat.pl' ],
+    meta_merge => {
+        resources => {
+            repository => 'http://github.com/book/Log-Procmail',
+        },
+    },
 );
 
 $builder->create_build_script();
