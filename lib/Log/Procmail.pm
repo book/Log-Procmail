@@ -10,7 +10,7 @@ use UNIVERSAL ();
 use vars qw/ $VERSION /;
 local $^W = 1;
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 my %month;
 @month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec /} = ( 0 .. 11 );
@@ -419,7 +419,7 @@ available for Log::Procmail and many other projects.
 
 =head1 COPYRIGHT 
 
-Copyright (c) 2002-2004, Philippe Bruhat. All Rights Reserved.
+Copyright (c) 2002-2013, Philippe Bruhat. All Rights Reserved.
 
 =head1 LICENSE
 
