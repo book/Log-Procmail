@@ -224,6 +224,11 @@ Log::Procmail - Perl extension for reading procmail logfiles.
 
 Log::Procmail reads procmail(1) logfiles and returns the abstracts one by one.
 
+Note:  The most recent procmail maintainer, Philip Geunther, says
+L<the code is not safe and should not be used|https://marc.info/?l=openbsd-ports&m=141634350915839&w=2>.
+There have been no releases since 2001 when Philip stopped maintaining it,
+you should find a replacement.
+
 =over 4
 
 =item $log = Log::Procmail->new( @files );
