@@ -10,7 +10,7 @@ use UNIVERSAL ();
 use vars qw/ $VERSION /;
 local $^W = 1;
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 my %month;
 @month{qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec /} = ( 0 .. 11 );
