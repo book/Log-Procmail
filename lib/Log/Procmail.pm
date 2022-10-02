@@ -36,6 +36,8 @@ sub next {
     {
         my $read;
 
+        # ensure we can read past the previous end of file
+        $fh->clearerr if $fh->eof;
       LINE:
         while (<$fh>) {
             $read++;
