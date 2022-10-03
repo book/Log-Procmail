@@ -203,7 +203,7 @@ sub ymd {
 
 __END__
 
-=encoding iso-8859-1
+=encoding utf-8
 
 =head1 NAME
 
@@ -410,7 +410,7 @@ Philippe "BooK" Bruhat <book@cpan.org>.
 
 =head1 ACKNOWLEDGMENTS
 
-Thanks to Briac "Oeufmayo" Pilpré and David "Sniper" Rigaudiere for early
+Thanks to Briac "Oeufmayo" PilprÃ© and David "Sniper" Rigaudiere for early
 comments on irc. Thanks to Olivier "rs" Poitrey for giving me his huge
 procmail log file (51 Mb spanning over a two-year period) and for probably
 being the first user of this module. Many thanks to Michael Schwern for
