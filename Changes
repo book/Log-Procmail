@@ -2,6 +2,8 @@ Revision history for Perl extension Log::Procmail.
 
 {{$NEXT}}
 
+0.13 2022-10-03 BOOK
+
 0.12 2012-01-03 BOOK
         - fixed an =encoding POD directive
 
