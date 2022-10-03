@@ -2,6 +2,10 @@ Revision history for Perl extension Log::Procmail.
 
 {{$NEXT}}
 
+0.14 2022-10-03 BOOK
+    - give proper attribution to Tony Cook in the Changes file
+    - fix up hurried release: clean up Changes, add missing contributors
+
 0.13 2022-10-03 BOOK
     - clear the eof flag to read past the previous end of file (TONYC)
     - switched to dzil for building the release
